@@ -13,6 +13,7 @@ import (
 
 const (
 	StringType = iota
+	StringSliceType
 	IntType
 	Float64Type
 	BoolType
@@ -33,14 +34,13 @@ var regMutex sync.RWMutex
 // Register registers a default value for an environment variable.  When getting the value for that
 // environment variable, if a value isn't set, the default is returned.
 func Register(key string, defaultValue interface{}, description string) {
-	regMutex.Lock()
-	defer regMutex.Unlock()
-
 	var dataType int
 
 	switch defaultValue.(type) {
 	case string:
 		dataType = StringType
+	case []string:
+		dataType = StringSliceType
 	case int:
 		dataType = IntType
 	case float64:
@@ -80,6 +80,7 @@ var (
 
 	typeNames = map[int]string{
 		StringType:   "string",
+		StringSliceType: "[]string",
 		IntType:      "integer",
 		Float64Type:  "float",
 		BoolType:     "boolean",
@@ -87,8 +88,8 @@ var (
 	}
 )
 
-// Display details about registered default variables.  May be called via a `--help` command-line
-// parameter, or if some setting is invalid.  Produces colorized output to stdout.
+// Help displays details about registered default variables.  May be called via a `--help`
+// command-line parameter, or if some setting is invalid.  Produces colorized output to stdout.
 func Help() {
 	var keys []string
 	var width, descWidth int

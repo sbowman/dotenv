@@ -74,8 +74,9 @@ func GetString(key string) string {
 	return ""
 }
 
-// GetString returns the environment variable as a string slice value.  If the environment variable
-// doesn't exist, returns the default value if present, otherwise a nil value.  Expects a the
+
+// GetStringSlice returns the environment variable as a string slice value.  If the environment
+// variable doesn't exist, returns the default value if present, otherwise a nil value.  Expects a
 // environment variable value to be a comma-separated list of values.
 func GetStringSlice(key string) []string {
 	if val, set := os.LookupEnv(key); set {
