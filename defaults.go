@@ -79,12 +79,12 @@ var (
 	descColor    = color.New(color.FgWhite)
 
 	typeNames = map[int]string{
-		StringType:   "string",
+		StringType:      "string",
 		StringSliceType: "[]string",
-		IntType:      "integer",
-		Float64Type:  "float",
-		BoolType:     "boolean",
-		DurationType: "duration",
+		IntType:         "integer",
+		Float64Type:     "float",
+		BoolType:        "boolean",
+		DurationType:    "duration",
 	}
 )
 
@@ -92,7 +92,7 @@ var (
 // command-line parameter, or if some setting is invalid.  Produces colorized output to stdout.
 func Help() {
 	var keys []string
-	var width, descWidth int
+	var width, descWidth, defvalWidth int
 	for key, d := range registered {
 		keys = append(keys, key)
 
@@ -103,19 +103,27 @@ func Help() {
 		if len(d.Description) > descWidth {
 			descWidth = len(d.Description)
 		}
-	}
 
-	if descWidth > 40 {
-		descWidth = 40
+		w := len(fmt.Sprintf("%v", d.DefaultValue))
+		if w > defvalWidth {
+			defvalWidth = w
+		}
 	}
-
-	sort.Strings(keys)
 
 	termWidth, _, err := terminal.GetSize(0)
 	if err != nil {
 		termWidth = 80
 	}
 
+	if width+descWidth+defvalWidth+18 > termWidth {
+		if defvalWidth > 20 {
+			defvalWidth = 20
+		}
+
+		descWidth = termWidth - width - defvalWidth - 18
+	}
+
+	sort.Strings(keys)
 	for _, key := range keys {
 		d := registered[key]
 
@@ -124,8 +132,8 @@ func Help() {
 		_, _ = typeColor.Print(pad(typeNames[d.DataType], 12))
 		fmt.Print("  ")
 		_, _ = descColor.Print(pad(d.Description, descWidth))
-		fmt.Print("    ")
-		_, _ = defaultColor.Println(pad(fmt.Sprintf("%v", d.DefaultValue), termWidth - width - 62))
+		fmt.Print("  ")
+		_, _ = defaultColor.Println(pad(fmt.Sprintf("%v", d.DefaultValue), defvalWidth))
 	}
 }
 
