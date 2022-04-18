@@ -111,6 +111,29 @@ func GetInt(key string) int {
 	return 0
 }
 
+// GetInt64 returns the environment variable as an int64 value.  If the environment variable doesn't
+// exist or is not an int64, returns the default value if present, otherwise returns 0.
+func GetInt64(key string) int64 {
+	if val, set := os.LookupEnv(key); set {
+		if ival, err := strconv.ParseInt(val, 10, 64); err == nil {
+			return ival
+		}
+	}
+
+	if descriptor, ok := Default(key); ok {
+		switch defaultValue := descriptor.DefaultValue.(type) {
+		case int:
+			return int64(defaultValue)
+		case int64:
+			return defaultValue
+		default:
+			return 0
+		}
+	}
+
+	return 0
+}
+
 // GetFloat64 returns the environment variable as an float64 value.  If the environment variable
 // doesn't exist, returns the default value if present, otherwise returns 0.
 func GetFloat64(key string) float64 {
