@@ -74,7 +74,6 @@ func GetString(key string) string {
 	return ""
 }
 
-
 // GetStringSlice returns the environment variable as a string slice value.  If the environment
 // variable doesn't exist, returns the default value if present, otherwise a nil value.  Expects a
 // environment variable value to be a comma-separated list of values.
@@ -227,7 +226,9 @@ func process(filename string) error {
 
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			return fmt.Errorf("unable to parse line %s:%d", filename, lineNo)
+			// rather than error out, simply skip this line...
+			// return fmt.Errorf("unable to parse line %s:%d", filename, lineNo)
+			continue
 		}
 
 		key := strings.TrimSpace(parts[0])
